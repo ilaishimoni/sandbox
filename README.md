@@ -1,6 +1,6 @@
 # Pytest introduction - UnitTesting, fixtures
 
-Our QA automation infrastructure uses the *pytest* framework to write our tests.
+We are using the *pytest* framework in our automation infrastructure to write our tests.
 
 ## Installation
 
@@ -120,12 +120,14 @@ def test_get_multiple_users(user_manager):
 Pytest will "collect" tests only if their name includes the word "test" in the function name.
 
 ### Assertions
-The assert() function simply performs a comparison of the two given arguments,   
-If one or more of the assertions inside the testing function fail, the test will be considered failed.
+The assert keyword simply performs a comparison of the two given arguments,   
+If any assertion occurs during the test, the test crashes.
 
 ### Pytest fixtures
 A fixture is a reusable, modular function built into pytest.   
 Our tests are meant to be independent, fixtures help us with that by creating a clean objects for the test to use and clean up the changes made by other tests.
+The more general usage of a fixture is to handle setup actions ( actions that occur before start of a test )   
+ and teardown actions ( actions that occur before the test ends ).
 
 Example :
 ```python

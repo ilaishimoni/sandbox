@@ -1,20 +1,24 @@
-# Pytest introduction - UnitTesting, fixtures
+# Pytest introduction - UnitTesting, fixtures, pytest-mock
 
 We are using the *pytest* framework in our automation infrastructure to write our tests.
 
 ## Installation
 
-Use the package manager [pip](https://pip.pypa.io/en/stable/) to install pytest.
-Together with it we will also intsall pytest-mock
+Install pytest with pip:
 
 ```bash
 pip install pytest
 ```
 
+Additionally, we will use a plugin for mocking functionality in tests:
+
 ```bash
 pip install pytest-mock
 ```
+
 ## Usage
+
+Here's a simple example for an assertion which will be picked up by pytest
 
 ```python
 
@@ -27,8 +31,7 @@ def test_answer():
     assert inc(3) == 5
 ```
 
-Then executing this using pytest will result in the following :
-
+Then executing this using the ```pytest``` command will result in the following :
 
     $ pytest
     ============================= test session starts =============================
@@ -123,11 +126,15 @@ Pytest will "collect" tests only if their name includes the word "test" in the f
 The assert keyword simply performs a comparison of the two given arguments,   
 If any assertion occurs during the test, the test crashes.
 
-### Pytest fixtures
+### The raises() function
+We are able to expect a specific exception in our testing, as well as the exact content attached to this exception.
+
+
+## Pytest fixtures
+
 A fixture is a reusable, modular function built into pytest.   
 Our tests are meant to be independent, fixtures help us with that by creating a clean objects for the test to use and clean up the changes made by other tests.
 The more general usage of a fixture is to handle setup actions ( actions that occur before start of a test ) and teardown actions ( actions that occur before the test ends ).
- 
 
 Example :
 ```python

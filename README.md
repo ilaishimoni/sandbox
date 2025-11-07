@@ -120,7 +120,7 @@ def test_get_multiple_users(user_manager):
 ```
 
 ### The "test" keyword
-Pytest will "collect" tests only if their name includes the word "test" in the function name.
+Pytest will "collect" tests only if their name includes the word ```test``` in the function name.
 
 ### Assertions
 The assert keyword simply performs a comparison of the two given arguments,   
@@ -130,7 +130,7 @@ If any assertion occurs during the test, the test crashes.
 We are able to expect a specific exception in our testing, as well as the exact content attached to this exception.
 
 
-## Pytest fixtures
+## Pytest fixtures - Setup
 
 A fixture is a reusable, modular function built into pytest.   
 Our tests are meant to be independent, fixtures help us with that by creating a clean objects for the test to use and clean up the changes made by other tests.
@@ -146,15 +146,15 @@ def test_get_user_email(user_manager):
     assert user_manager.get_user_email("Ilai") == "ilaishimoni@gmail.com"
 
 ```
-Both of the tests are interacting with the user_manager class instance, if no cleanup of the function `test_add_new_user` will be performed the function `test_get_user_email` will no be able to register the user, not the expected behavior of the test !.
+Both of the tests are interacting with the user_manager class instance, if no cleanup of the function `test_add_new_user` will be performed the function `test_get_user_email` will no be able to register the user, not the expected behavior of the test.
 
-And so if our `user_manager` instance will be set as follows : 
+And so if our `user_manager` will be set as a global variable ( and not received as a param ) 
 
 ```python
 user_manager = UserManager()
 ```
 
-our second test will fail
+our second test will fail :
 
 ```
 unitest.py .F                                                                                                                                                                                                                [100%]
@@ -181,7 +181,7 @@ FAILED unitest.py::test_get_user_email - ValueError: User already exists
 
 ```
 
-Passing the instance to the tests as a fixture solves the issue
+Passing the instance to the tests as a fixture solves the issue - making sure a clean object is used.
 
 ```python
 @pytest.fixture
@@ -208,3 +208,6 @@ unitest.py ..                                                                   
 ======================================================================================================== 2 passed in 0.02s ========================================================================================================
 
 ```
+
+## Pytest Fixtures - Teardown
+

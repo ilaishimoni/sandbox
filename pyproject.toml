@@ -1,14 +1,14 @@
 [project]
-name = "pycharmmiscproject"
+name = "sandbox"
 version = "0.1.0"
 description = ""
 authors = [
-    {name = "Ilai Shimoni"}
+    {name = "ilai",email = "ilaishimoni@gmail.com"}
 ]
 readme = "README.md"
-requires-python = ">=3.13"
+requires-python = ">=3.14"
 dependencies = [
-    "pytest (>=8.4.2,<9.0.0)",
+    "pytest (>=9.0.1,<10.0.0)",
     "pytest-mock (>=3.15.1,<4.0.0)"
 ]
 

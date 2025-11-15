@@ -1,4 +1,4 @@
-# Pytest introduction - UnitTesting, fixtures, pytest-mock
+# Pytest introduction - UnitTesting, fixtures, parameterize, pytest-mock
 
 We are using the *pytest* framework in our automation infrastructure to write our tests.
 
@@ -83,7 +83,7 @@ Here is how the unit tests should look like :
 
 ```python
 import pytest
-from main import UserManager
+from user_manager import UserManager
 
 @pytest.fixture
 def user_manager():
@@ -129,7 +129,6 @@ If any assertion occurs during the test, the test crashes.
 ### The raises() function
 We are able to expect a specific exception in our testing, as well as the exact content attached to this exception.
 
-
 ## Pytest fixtures - Setup
 
 A fixture is a reusable, modular function built into pytest.   
@@ -146,7 +145,7 @@ def test_get_user_email(user_manager):
     assert user_manager.get_user_email("Ilai") == "ilaishimoni@gmail.com"
 
 ```
-Both of the tests are interacting with the user_manager class instance, if no cleanup of the function `test_add_new_user` will be performed the function `test_get_user_email` will no be able to register the user, not the expected behavior of the test.
+Both of the tests are interacting with the user_manager class instance, if no cleanup of the function `test_add_new_user` will be performed, the function `test_get_user_email` will not be able to register the user, not the expected behavior of the test.
 
 And so if our `user_manager` will be set as a global variable ( and not received as a param ) 
 
@@ -194,20 +193,116 @@ def user_manager():
 ```
 unitest.py ..                                                                                                                                                                                                                [100%]
 
-======================================================================================================== 2 passed in 0.03s ========================================================================================================
-(.venv) PS C:\Users\ilai\PyCharmMiscProject> pytest .\unitest.py
-======================================================================================================= test session starts =======================================================================================================
-platform win32 -- Python 3.13.5, pytest-8.4.2, pluggy-1.6.0
-rootdir: C:\Users\ilai\PyCharmMiscProject
-configfile: pyproject.toml
-plugins: anyio-4.11.0, mock-3.15.1
-collected 2 items                                                                                                                                                                                                                  
-
-unitest.py ..                                                                                                                                                                                                                [100%]
-
 ======================================================================================================== 2 passed in 0.02s ========================================================================================================
 
 ```
 
 ## Pytest Fixtures - Teardown
+
+The fixture function can also be used to clean up a test after it is done.
+
+Example :
+
+Given a database :
+
+```python
+class Database:
+    """Simulates a basic user database"""
+    def __init__(self):
+        self.data = {} # Simulating an in-memory database
+
+    def add_user(self, user_id, name):
+        if user_id in self.data:
+            raise ValueError("User already exists")
+        self.data[user_id] = name
+
+    def get_user(self, user_id):
+        return self.data.get(user_id, None)
+
+    def delete_user(self, user_id):
+        if user_id in self.data:
+            del self.data[user_id]
+
+```
+
+We will want to create tests and ensuring that we clean up the DB after every test
+
+```python
+@pytest.fixture
+
+from database import Database
+
+def db():
+    """Provides a fresh instance of the Database class and cleans up after the test."""
+    database = Database()
+    yield database # Provide the fixture instance
+    database.data.clear() #Cleanup step ( not needed for in-memory, but useful for real DBs )
+
+def test_add_user(db):
+    db.add_user(1, "Alice")
+    assert db.get_user(1) == "Alice"
+
+def test_add_duplicate_user(db):
+    db.add_user(1, "Alice")
+    with pytest.raises(ValueError, match="User already exists"):
+        db.add_user(1, "Bob")
+
+def test_delete_user(db):
+    db.add_user(2, "Bob")
+    db.delete_user(2)
+    assert db.get_user(2) is None
+```
+
+the cleanup part of the fixture is not really used here, but can be useful   
+for performing a database cleanup after every test.
+
+### yield keyword
+The yield keyword separates the cleanup actions apart from the teardown actions,    
+yield in Python turns a function into a generator — a function that can pause, return a value,   
+and then resume exactly where it left off the next time it is called.
+
+
+## Parametrize
+
+The parametrize decorator allows us to run the same test function multiple times with different inputs.
+
+it saves repetitiveness in our code and allows for a simpler testing infrastructure.
+
+For example testing the following function in different cases :
+
+```python
+def is_prime(n):
+    if n < 2:
+        return False
+    for i in range(2, int ( n ** 0.5 ) + 1 ):
+        if n % i == 0:
+            return False
+    return True
+```
+
+Testing the function for many different cases can be done easily :
+```python
+import pytest
+from is_prime import is_prime
+
+
+@pytest.mark.parametrize("num, expected", [
+    (1, False),
+    (2, True),
+    (3, True),
+    (4, False),
+    (17, True),
+    (18, False),
+    (19, True),
+    (25, False),
+])
+def test_is_prime(num, expected):
+    assert is_prime(num) == expected
+```
+
+```
+unit_testing\parameterize\test_is_prime.py ........                                                                                                                                                                          [100%]
+
+======================================================================================================== 8 passed in 0.04s =======================================================================================================
+```
 
